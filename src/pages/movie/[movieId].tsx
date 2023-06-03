@@ -172,28 +172,34 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const {movieId} = ctx.params as { movieId:string };
-    let movie = null;
+    let movie = null, characters : ItemCharacterList[] = [];
     
     try{
         const {data:dataMovie} = await jikanApi.get(`/anime/${movieId}`);
+        const {data:dataCharacters} = await jikanApi.get<CharactersListResponse>(`/anime/${movieId}/characters`);
         movie = dataMovie.data;
+        characters = dataCharacters.data;
     }catch(err){}
 
     if(!movie){
+        // return {
+        //     redirect:{
+        //         destination:'/',
+        //         permanent:false,
+        //     }
+        //   }
         return {
-            redirect:{
-                destination:'/',
-                permanent:false,
-            }
+            notFound: true
           }
     }
     
-    const {data:dataCharacters} = await jikanApi.get<CharactersListResponse>(`/anime/${movieId}/characters`);
+    
 
     return {
         props: {
             movie : movie as OnePieceMovie,
-            characters: dataCharacters.data, 
+            //characters: dataCharacters.data, 
+            characters, 
         },
         revalidate:  60 * 60 * 24 * 7
     }
