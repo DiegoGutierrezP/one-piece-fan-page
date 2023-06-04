@@ -8,7 +8,7 @@ interface MovieInfoResponse {
 }
 
  export const getMovieInfo = async (movieId : string) : Promise<MovieInfoResponse | null | undefined> => {
-    await avoidRateLimit(1000);
+    await avoidRateLimit(1500);
     try{
         const {data:dataMovie} = await jikanApi.get(`/anime/${movieId}`);
         const {data:dataCharacters} = await jikanApi.get<CharactersListResponse>(`/anime/${movieId}/characters`);
