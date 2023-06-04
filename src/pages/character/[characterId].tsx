@@ -68,14 +68,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }catch(err){}
 
   if(!character){
-    // return {
-    //   redirect:{
-    //       destination:'/',
-    //       permanent:false,
-    //   }
-    // }
     return {
-      notFound: true
+      redirect:{
+          destination:'/',
+          permanent:false,
+      }
     }
   }
   

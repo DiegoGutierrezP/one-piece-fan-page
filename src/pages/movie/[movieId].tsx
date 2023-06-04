@@ -5,6 +5,7 @@ import { ItemCharacterList, CharactersListResponse, OnePieceMovie, OnePieceMovie
 import { jikanApi } from '@/api';
 import { Grid } from '@nextui-org/react';
 import { CharacterCard } from '@/components/ui';
+import { getMovieInfo } from '@/utils';
 
 interface Props {
     movie : OnePieceMovie;
@@ -172,24 +173,16 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 export const getStaticProps: GetStaticProps = async (ctx) => {
 
     const {movieId} = ctx.params as { movieId:string };
-    let movie = null, characters : ItemCharacterList[] = [];
-    
-    try{
-        const {data:dataMovie} = await jikanApi.get(`/anime/${movieId}`);
-        const {data:dataCharacters} = await jikanApi.get<CharactersListResponse>(`/anime/${movieId}/characters`);
-        movie = dataMovie.data;
-        characters = dataCharacters.data;
-    }catch(err){}
 
-    if(!movie){
-        // return {
-        //     redirect:{
-        //         destination:'/',
-        //         permanent:false,
-        //     }
-        //   }
+    const data = await getMovieInfo(movieId);
+
+
+    if(!data){
         return {
-            notFound: true
+            redirect:{
+                destination:'/',
+                permanent:false,
+            }
           }
     }
     
@@ -197,9 +190,8 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
 
     return {
         props: {
-            movie : movie as OnePieceMovie,
-            //characters: dataCharacters.data, 
-            characters, 
+            movie:data.movie,
+            characters : data.characters
         },
         revalidate:  60 * 60 * 24 * 7
     }
